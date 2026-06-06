@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dibujo con Firebase</title>
+
+<style>
+body {
+    margin: 0;
+    overflow: hidden;
+}
+
+canvas {
+    display: block;
+    background: white;
+    cursor: crosshair;
+}
+
+#enviar {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 12px 20px;
+    font-size: 16px;
+    z-index: 100;
+}
+</style>
+</head>
+<body>
+
+<button id="enviar">Enviar</button>
+<canvas id="canvas"></canvas>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBWhFE2VQEYiUpPsyK2f8uYKRUm9xh2M3o",
+  authDomain: "ull-collage.firebaseapp.com",
+  projectId: "ull-collage",
+  storageBucket: "ull-collage.firebasestorage.app",
+  messagingSenderId: "784943019157",
+  appId: "1:784943019157:web:3a8fc16d375c9c6c7b579c",
+  measurementId: "G-V0ZQSJ0GH3"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+
+resizeCanvas();
+
+let drawing = false;
+
+canvas.addEventListener("mousedown", (e) => {
+  drawing = true;
+  ctx.beginPath();
+  ctx.moveTo(e.clientX, e.clientY);
+});
+
+canvas.addEventListener("mousemove", (e) => {
+  if (!drawing) return;
+
+  ctx.lineTo(e.clientX, e.clientY);
+  ctx.strokeStyle = "#000";
+  ctx.lineWidth = 4;
+  ctx.lineCap = "round";
+  ctx.stroke();
+});
+
+window.addEventListener("mouseup", () => {
+  drawing = false;
+});
+
+window.addEventListener("resize", resizeCanvas);
+
+document.getElementById("enviar").addEventListener("click", async () => {
+
+  try {
+
+    const imagenBase64 = canvas.toDataURL("image/png");
+
+    await addDoc(collection(db, "dibujos"), {
+      dibujo: imagenBase64,
+      fecha: serverTimestamp()
+    });
+
+    alert("Dibujo guardado correctamente");
+
+} catch (error) {
+  console.log("ERROR COMPLETO:", error);
+  alert(error.message);
+}
+
+});
+
+</script>
+
+</body>
+</html>
