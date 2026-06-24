@@ -8,38 +8,184 @@
 <style>
 body {
     margin: 0;
-    overflow: hidden;
+    overflow-y: scroll;
+    font-family: Arial, sans-serif;
 }
+
+.logo {
+  position: fixed;
+  top: 20px;      
+  left: 20px;    
+  width: 260px;   
+  height: auto;
+  z-index: 9999;
+}
+
+
+#imagen-movil {
+    position: fixed;
+    width: 220px;
+    height: auto;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 999;
+    cursor: grab;
+    user-select: none;
+    touch-action: none;
+}
+
+#imagen-movil:active {
+    cursor: grabbing;
+}
+
+
+/* CANVAS */
+#zona-dibujo {
+    width: 100%;
+    height: 200vh;
+    position: relative;
+}
+
 
 canvas {
     display: block;
     background: white;
     cursor: crosshair;
+    position: absolute;
+    top: 0;
+    left: 0;
 }
 
+#canvas {
+    height: 200vh;
+}
+
+
+
+
+/* BOTÓN ENVIAR */
 #enviar {
     position: fixed;
     top: 20px;
     right: 20px;
     padding: 12px 20px;
+     font-family: 'Inter', sans-serif;
     font-size: 16px;
-    z-index: 100;
+    z-index: 200;
+    background-color: rgba(255, 255, 255, 0.95);
+    color: #1262E3;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+/* GALERÍA */
+#galeria-wrapper {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(0,0,0,0.1);
+    z-index: 9999;
+}
+
+#galeria-title {
+    font-size: 14px;
+    font-weight: bold;
+    padding: 10px;
+    color: #333;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+}
+
+#galeria {
+    height: 120px;
+    overflow-x: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px;
+}
+
+#galeria img {
+    height: 100px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+#galeria img:hover {
+    transform: scale(1.05);
+}
+
+
+
+/* POPUP */
+#popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 99999;
+}
+
+#popup img {
+    max-width: 90%;
+    max-height: 90%;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    background: white;
 }
 </style>
 </head>
-<body>
 
-<button id="enviar">Enviar</button>
-<canvas id="canvas"></canvas>
+<body>
+<img src="./logo.png" class="logo" alt="Logo">
+
+<img 
+  id="imagen-movil" 
+  src="./images/tmob.png" 
+  alt="imagen flotante">
+
+    
+<button id="enviar">Enviar Collage</button>
+
+<div id="zona-dibujo">
+    <canvas id="canvas"></canvas>
+</div>
+
+<div id="galeria-wrapper">
+  <div id="galeria-title">Últimos collages enviados</div>
+  <div id="galeria"></div>
+</div>
+
+<div id="popup">
+  <img id="popup-img">
+</div>
 
 <script type="module">
 
+
+
+/* FIREBASE */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
 import {
   getFirestore,
   collection,
   addDoc,
-  serverTimestamp
+  onSnapshot,
+  query,
+  orderBy
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -55,58 +201,240 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+/* CANVAS */
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
 function resizeCanvas() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
+    canvas.width = window.innerWidth;
+    canvas.height = document.getElementById("zona-dibujo").offsetHeight;
 }
-
 resizeCanvas();
 
 let drawing = false;
 
 canvas.addEventListener("mousedown", (e) => {
-  drawing = true;
-  ctx.beginPath();
-  ctx.moveTo(e.clientX, e.clientY);
+    drawing = true;
+    ctx.beginPath();
+    ctx.moveTo(
+    e.clientX,
+    e.clientY + window.scrollY);
 });
 
 canvas.addEventListener("mousemove", (e) => {
-  if (!drawing) return;
+    if (!drawing) return;
 
-  ctx.lineTo(e.clientX, e.clientY);
-  ctx.strokeStyle = "#000";
-  ctx.lineWidth = 4;
-  ctx.lineCap = "round";
-  ctx.stroke();
+    ctx.lineTo(
+    e.clientX,
+    e.clientY + window.scrollY);
+    ctx.strokeStyle = "#000";
+    ctx.lineWidth = 4;
+    ctx.lineCap = "round";
+    ctx.stroke();
 });
 
 window.addEventListener("mouseup", () => {
-  drawing = false;
+    drawing = false;
 });
 
 window.addEventListener("resize", resizeCanvas);
 
+/* ENVIAR */
 document.getElementById("enviar").addEventListener("click", async () => {
 
-  try {
+    try {
 
-    const imagenBase64 = canvas.toDataURL("image/png");
+        // canvas temporal con tamaño de pantalla
+        const captura = document.createElement("canvas");
+        captura.width = window.innerWidth;
+        captura.height = window.height;
 
-    await addDoc(collection(db, "dibujos"), {
-      dibujo: imagenBase64,
-      fecha: serverTimestamp()
-    });
+        const c = captura.getContext("2d");
 
-    alert("Dibujo guardado correctamente");
 
-} catch (error) {
-  console.log("ERROR COMPLETO:", error);
-  alert(error.message);
+        // fondo blanco
+        c.fillStyle = "white";
+        c.fillRect(
+            0,
+            0,
+            captura.width,
+            captura.height
+        );
+
+
+        // 1. copiar dibujo del canvas
+        c.drawImage(
+            canvas,
+            0,
+            0
+        );
+
+
+        // 2. copiar imagen flotante con su posición actual
+        const img = document.getElementById("imagen-movil");
+
+        const imagen = new Image();
+
+        imagen.onload = async () => {
+
+
+            const rect = img.getBoundingClientRect();
+
+
+            c.drawImage(
+                imagen,
+                rect.left,
+                rect.top,
+                rect.width,
+                rect.height
+            );
+
+
+            // convertir captura final
+            const imagenBase64 = captura.toDataURL(
+                "image/png",
+                0.8
+            );
+
+
+            await addDoc(collection(db, "dibujos"), {
+
+                dibujo: imagenBase64,
+
+                // guardamos también posición por si luego quieres editarlo
+                elementos: {
+
+                    imagen: {
+                        src: "./images/tmob.png",
+                        x: rect.left,
+                        y: rect.top,
+                        width: rect.width,
+                        height: rect.height
+                    }
+
+                },
+
+                fecha: Date.now()
+
+            });
+
+
+            alert("Collage guardado correctamente");
+
+        };
+
+
+        imagen.src = img.src;
+
+
+    } catch (error) {
+
+        console.log(error);
+        alert(error.message);
+
+    }
+
+});
+
+
+/* POPUP */
+const popup = document.getElementById("popup");
+const popupImg = document.getElementById("popup-img");
+
+function openPopup(src) {
+    popupImg.src = src;
+    popup.style.display = "flex";
 }
 
+popup.addEventListener("click", () => {
+    popup.style.display = "none";
+    popupImg.src = "";
+});
+
+/* GALERÍA */
+const q = query(
+    collection(db, "dibujos"),
+    orderBy("fecha", "desc")
+);
+
+onSnapshot(q, (snapshot) => {
+    galeria.innerHTML = "";
+
+    snapshot.forEach((doc) => {
+        const data = doc.data();
+
+        const img = document.createElement("img");
+        img.src = data.dibujo;
+
+        img.onclick = () => openPopup(data.dibujo);
+
+        galeria.appendChild(img);
+    });
+});
+
+/* IMAGEN INTERACTIVA */
+
+const imagenMovil = document.getElementById("imagen-movil");
+
+let moviendo = false;
+let offsetX = 0;
+let offsetY = 0;
+
+imagenMovil.addEventListener("mousedown", (e) => {
+
+    moviendo = true;
+
+    offsetX = e.clientX - imagenMovil.offsetLeft;
+    offsetY = e.clientY - imagenMovil.offsetTop;
+
+    imagenMovil.style.transform = "none";
+});
+
+
+document.addEventListener("mousemove", (e) => {
+
+    if (!moviendo) return;
+
+    imagenMovil.style.left = (e.clientX - offsetX) + "px";
+    imagenMovil.style.top = (e.clientY - offsetY) + "px";
+
+});
+
+
+document.addEventListener("mouseup", () => {
+    moviendo = false;
+});
+
+
+// soporte móvil / táctil
+imagenMovil.addEventListener("touchstart", (e) => {
+
+    moviendo = true;
+
+    const touch = e.touches[0];
+
+    offsetX = touch.clientX - imagenMovil.offsetLeft;
+    offsetY = touch.clientY - imagenMovil.offsetTop;
+
+    imagenMovil.style.transform = "none";
+
+});
+
+
+document.addEventListener("touchmove", (e) => {
+
+    if (!moviendo) return;
+
+    const touch = e.touches[0];
+
+    imagenMovil.style.left = (touch.clientX - offsetX) + "px";
+    imagenMovil.style.top = (touch.clientY - offsetY) + "px";
+
+});
+
+
+document.addEventListener("touchend", () => {
+    moviendo = false;
 });
 
 </script>
