@@ -19,26 +19,68 @@ body {
   width: 260px;   
   height: auto;
   z-index: 9999;
+  transition: opacity 0.3s ease; 
+}
+
+/* IMAGE CONTAINER */
+#elementos-canvas {
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    z-index:20;
+    pointer-events:none;
 }
 
 
-#imagen-movil {
-    position: fixed;
-    width: 220px;
+#fondos-fijos {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 200vh;
+    z-index: 1;           
+    pointer-events: none;
+}
+
+.imagen-fija {
+    position: absolute;
+    width: 400px;        
     height: auto;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 999;
-    cursor: grab;
+    pointer-events: none; 
     user-select: none;
-    touch-action: none;
 }
 
-#imagen-movil:active {
-    cursor: grabbing;
+/* IMAGEN Y LETRA INDEPENDIENTE */
+
+.imagen-movil {
+    position:absolute;
+    width:220px;
+    height:auto;
+    cursor:grab;
+    user-select:none;
+    touch-action:none;
+    pointer-events:auto;
 }
 
+
+.imagen-movil:active {
+    cursor:grabbing;
+}
+
+.letra-movil {
+    position:absolute;
+    width:40px;
+    height:auto;
+    cursor:grab;
+    user-select:none;
+    touch-action:none;
+    pointer-events:auto;
+}
+
+.letra-movil:active {
+    cursor:grabbing;
+}
 
 /* CANVAS */
 #zona-dibujo {
@@ -50,19 +92,147 @@ body {
 
 canvas {
     display: block;
-    background: white;
+    background: transparent;
     cursor: crosshair;
     position: absolute;
     top: 0;
     left: 0;
+    z-index: 10;          
 }
 
 #canvas {
     height: 200vh;
 }
 
+#text-canvas {
+    width: 100%;
+    height: 200vh;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 30;
+    pointer-events: none;
+    background: transparent; 
+}
+
+/* BOTÓN TOOLS*/
+/* BOTÓN CRAYON */
+
+#crayon-btn {
+    position: fixed;
+    right: 20px;
+    bottom: 20%;
+    transform: translateY(-50%);
+
+    width: 72px;
+    height: 72px;
+
+    border-radius: 50%;
+    border: none;
+
+    background: #FFDD22;
+
+    cursor: pointer;
+
+    z-index: 5000;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+
+    transition: transform 0.2s ease;
+}
+
+#crayon-btn:hover {
+    transform: translateY(-50%) scale(1.08);
+}
+
+#crayon-btn img {
+    width: 40px;
+    height: auto;
+    display: block;
+    rotate: -45deg;
+    pointer-events: none;
+}
+
+/* CRAYON */
+#crayon-btn img {
+    width: 40px;
+    height: auto;
+    display: block;
+    pointer-events: none;
+}
+
+/* TOOL MENU */
+#tools-menu {
+    position: fixed;
+    right: 25px;
+    bottom: calc(20% + 90px);
+    display: none;
+    flex-direction: column;
+    gap: 15px;
+    z-index: 5001;
+}
+
+.tool-circle {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
 
 
+/* COLOR BUTTON */
+#color-tool {
+    background: #000;
+}
+
+/* hidden native picker */
+#color-picker {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+
+#color-tool:hover {
+    transform: translateY(-5%) scale(1.08);
+}
+
+/* TEXT */
+#text-tool {
+    background: #DA63EF;
+    font-size: 24px; 
+    color: white;
+}
+
+#text-tool:hover {
+    transform: translateY(-5%) scale(1.08);
+}
+
+/* ERASER */
+#eraser-tool {
+    background: #1262E3;
+}
+
+#eraser-tool img {
+    width: 35px;
+    height: auto;
+    pointer-events: none;
+}
+
+#eraser-tool:hover {
+    transform: translateY(-5%) scale(1.08);
+}
 
 /* BOTÓN ENVIAR */
 #enviar {
@@ -79,6 +249,11 @@ canvas {
     border-radius: 12px;
     cursor: pointer;
     transition: all 0.3s ease;
+}
+
+#enviar:hover {
+     background-color: #1262E3;
+     color: rgba(255, 255, 255, 0.95);
 }
 
 /* GALERÍA */
@@ -122,8 +297,6 @@ canvas {
     transform: scale(1.05);
 }
 
-
-
 /* POPUP */
 #popup {
     position: fixed;
@@ -151,16 +324,52 @@ canvas {
 <body>
 <img src="./logo.png" class="logo" alt="Logo">
 
-<img 
-  id="imagen-movil" 
-  src="./images/tmob.png" 
-  alt="imagen flotante">
+<div id="fondos-fijos"></div> 
+<div id="elementos-canvas"></div>
 
-    
 <button id="enviar">Enviar Collage</button>
+
+<button id="crayon-btn">
+    <img src="./images/crayon.png" alt="Crayon">
+</button>
+
+<div id="tools-menu">
+
+    <button 
+      id="color-tool"
+      class="tool-circle">
+
+        <input 
+          id="color-picker"
+          type="color"
+          value="#000000">
+
+    </button>
+
+        <button
+        id="text-tool"
+        class="tool-circle">
+
+        Abc
+        </button>
+
+    <button 
+      id="eraser-tool"
+      class="tool-circle">
+
+        <img src="./images/eraser.png">
+
+</button>
+
+</button>
+
+
+</div>
 
 <div id="zona-dibujo">
     <canvas id="canvas"></canvas>
+    <canvas id="text-canvas"></canvas>
+
 </div>
 
 <div id="galeria-wrapper">
@@ -201,140 +410,355 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+// IMAGE CONTAINER
+
+const imagenesDisponibles = [
+
+"./images/tmob.png",
+"./images/laus.jpeg",
+"./images/chair.png",
+"./images/bigb.png", 
+
+// IMAGE ABC
+  "./images/abc/A.png",
+  "./images/abc/B.png",
+  "./images/abc/C.png",
+  "./images/abc/D.png",
+  "./images/abc/E.png",
+  "./images/abc/F.png",
+  "./images/abc/G.png",
+  "./images/abc/H.png",
+  "./images/abc/I.png",
+  "./images/abc/J.png",
+  "./images/abc/K.png",
+  "./images/abc/L.png",
+  "./images/abc/M.png",
+  "./images/abc/N.png",
+  "./images/abc/O.png",
+  "./images/abc/P.png",
+  "./images/abc/Q.png",
+  "./images/abc/R.png",
+  "./images/abc/S.png",
+  "./images/abc/T.png",
+  "./images/abc/U.png",
+  "./images/abc/V.png",
+  "./images/abc/W.png",
+  "./images/abc/X.png",
+  "./images/abc/Y.png",
+  "./images/abc/Z.png",
+];
+
+
+// TEXT AND IMAGES
+
+const contenedor =
+document.getElementById("elementos-canvas");
+
+
+let elementos = [];
+
+let textos = [];
+let textoActivo = null;
+let draggingTexto = false;
+
+let trazos = [];
+let trazoActual = [];
+
+
+function crearFondo(src, x, y) {
+    const contenedorFondos = document.getElementById("fondos-fijos");
+    const img = document.createElement("img");
+    img.src = src;
+    img.className = "imagen-fija";
+    img.style.left = x + "px";
+    img.style.top = y + "px";
+    contenedorFondos.appendChild(img);
+}
+
+function crearImagen(src,x,y){
+
+    const img=document.createElement("img");
+
+    img.src=src;
+    img.className="imagen-movil";
+    img.style.left=x+"px";
+    img.style.top=y+"px";
+    contenedor.appendChild(img);
+    elementos.push({
+        src:src,
+        x:x,
+        y:y,
+        width:220
+    });
+    
+    moverImagen(img);
+    img.dataset.id =
+    elementos.length-1;
+}
+
+function crearLetra(src,x,y){
+
+    const img=document.createElement("img");
+
+    img.src=src;
+    img.className="letra-movil";
+    img.style.left=x+"px";
+    img.style.top=y+"px";
+    contenedor.appendChild(img);
+    elementos.push({
+        src:src,
+        x:x,
+        y:y,
+        width:40
+    });
+
+    moverImagen(img);
+    img.dataset.id =
+    elementos.length-1;
+}
+
 /* CANVAS */
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
+const textCanvas = document.getElementById("text-canvas");
+const ctxText = textCanvas.getContext("2d");
+
 function resizeCanvas() {
     canvas.width = window.innerWidth;
     canvas.height = document.getElementById("zona-dibujo").offsetHeight;
+    textCanvas.width = canvas.width;
+    textCanvas.height = canvas.height;
+
+    document.getElementById("elementos-canvas").style.height = canvas.height + "px";
 }
 resizeCanvas();
 
+
+// 
+
+crearFondo("./images/laus.jpeg", 100, 500);  
+
+crearImagen("./images/tmob.png",800,300);
+crearImagen("./images/chair.png",300,400);
+crearImagen("./images/bigb.png",600,300);
+
+// ABC
+const alfabeto = [
+  "A","B","C","D","E","F","G","H","I","J","K","L","M",
+  "N","O","P","Q","R","S","T","U","V","W","X","Y","Z"
+];
+
+const inicioX = 30;
+const inicioY = 360;
+const espacioX = 30;
+const espacioY = 30;
+const porFila = 9;
+const copias = 2; // <-- cuántas letras "de repuesto" por debajo
+
+for (let c = 0; c < copias; c++) {
+    alfabeto.forEach((letra, i) => {
+        const fila = Math.floor(i / porFila);
+        const columna = i % porFila;
+
+        const x = inicioX + columna * espacioX;
+        const y = inicioY + fila * espacioY;
+
+        crearLetra(`./images/abc/${letra}.png`, x, y);
+    });
+}
+
+
+
 let drawing = false;
 
+let currentColor = "#000000";
+let erasing = false;
+let textMode = false;
+
+
 canvas.addEventListener("mousedown", (e) => {
+
+    if(textMode){
+
+        const texto = prompt("Escribe un texto:");
+
+        if (texto) {
+             textos.push({
+                text: texto,
+                x: e.clientX,
+                y: e.clientY + window.scrollY,
+                color: currentColor,
+                size: 32
+            });
+            renderTextos(); //
+        }
+
+        textMode = false;
+        return;
+    }
+
+        const x = e.clientX;
+        const y = e.clientY + window.scrollY;
+
+        const hit = detectarTexto(x, y);
+
+        if (hit) {
+            textoActivo = hit;
+            draggingTexto = true;
+            return;
+        }
+
     drawing = true;
+
     ctx.beginPath();
+
     ctx.moveTo(
-    e.clientX,
-    e.clientY + window.scrollY);
+        e.clientX,
+        e.clientY + window.scrollY
+    );
+
 });
 
+
 canvas.addEventListener("mousemove", (e) => {
-    if (!drawing) return;
+
+    if (draggingTexto && textoActivo) {
+        textoActivo.x = e.clientX;
+        textoActivo.y = e.clientY + window.scrollY;
+        redraw();
+        return;
+    }
+
+    if(!drawing) return;
 
     ctx.lineTo(
     e.clientX,
-    e.clientY + window.scrollY);
-    ctx.strokeStyle = "#000";
+    e.clientY + window.scrollY
+);
+
+ctx.lineWidth = 4;
+ctx.lineCap = "round";
+
+if (erasing) {
+    ctx.globalCompositeOperation = "destination-out";
+    ctx.lineWidth = 30;
+} else {
+    ctx.globalCompositeOperation = "source-over";
+    ctx.strokeStyle = currentColor;
     ctx.lineWidth = 4;
-    ctx.lineCap = "round";
-    ctx.stroke();
+}
+
+ctx.stroke();
+renderTextos();
+
 });
 
+
 window.addEventListener("mouseup", () => {
+
     drawing = false;
+
+    ctx.globalCompositeOperation = "source-over";
+
+    draggingTexto = false;
+    textoActivo = null;
+
 });
+
 
 window.addEventListener("resize", resizeCanvas);
 
-/* ENVIAR */
-document.getElementById("enviar").addEventListener("click", async () => {
-
-    try {
-
-        // canvas temporal con tamaño de pantalla
-        const captura = document.createElement("canvas");
-        captura.width = window.innerWidth;
-        captura.height = window.height;
-
-        const c = captura.getContext("2d");
-
-
-        // fondo blanco
-        c.fillStyle = "white";
-        c.fillRect(
-            0,
-            0,
-            captura.width,
-            captura.height
-        );
-
-
-        // 1. copiar dibujo del canvas
-        c.drawImage(
-            canvas,
-            0,
-            0
-        );
-
-
-        // 2. copiar imagen flotante con su posición actual
-        const img = document.getElementById("imagen-movil");
-
-        const imagen = new Image();
-
-        imagen.onload = async () => {
-
-
-            const rect = img.getBoundingClientRect();
-
-
-            c.drawImage(
-                imagen,
-                rect.left,
-                rect.top,
-                rect.width,
-                rect.height
-            );
-
-
-            // convertir captura final
-            const imagenBase64 = captura.toDataURL(
-                "image/png",
-                0.8
-            );
-
-
-            await addDoc(collection(db, "dibujos"), {
-
-                dibujo: imagenBase64,
-
-                // guardamos también posición por si luego quieres editarlo
-                elementos: {
-
-                    imagen: {
-                        src: "./images/tmob.png",
-                        x: rect.left,
-                        y: rect.top,
-                        width: rect.width,
-                        height: rect.height
-                    }
-
-                },
-
-                fecha: Date.now()
-
-            });
-
-
-            alert("Collage guardado correctamente");
-
-        };
-
-
-        imagen.src = img.src;
-
-
-    } catch (error) {
-
-        console.log(error);
-        alert(error.message);
-
+// ESCONDER LOGO
+window.addEventListener("scroll", () => {
+    const logo = document.querySelector(".logo");
+    if (window.scrollY > 50) {
+        logo.style.opacity = "0";
+        logo.style.pointerEvents = "none";
+    } else {
+        logo.style.opacity = "1";
+        logo.style.pointerEvents = "auto";
     }
-
 });
+
+/* ENVIAR */
+/* ENVIAR */
+
+document.getElementById("enviar")
+.addEventListener("click", async()=>{
+
+
+const captura=document.createElement("canvas");
+
+
+captura.width=window.innerWidth;
+
+captura.height=window.innerHeight;
+
+
+
+const c=captura.getContext("2d");
+
+
+
+c.fillStyle="white";
+
+c.fillRect(
+0,
+0,
+captura.width,
+captura.height
+);
+
+
+
+// dibujo
+
+c.drawImage( canvas, 0, 0 );
+
+
+c.drawImage(textCanvas, 0, 0); 
+
+
+//  todas las imágenes
+
+document
+.querySelectorAll(".imagen-movil, .letra-movil")
+.forEach(img=>{
+
+const r =
+img.getBoundingClientRect(); 
+c.drawImage(
+    img,
+    r.left,
+    r.top,
+    r.width,
+    r.height 
+);
+});
+
+const imagenBase64 =
+captura.toDataURL(
+"image/png",
+0.8
+);
+
+
+await addDoc(
+collection(db, "dibujos"),
+{
+    dibujo: imagenBase64,
+    elementos: elementos,
+    textos: textos,
+    fecha: Date.now()
+}
+);
+
+alert("Collage guardado correctamente");
+
+})
+
+
 
 
 /* POPUP */
@@ -357,6 +781,9 @@ const q = query(
     orderBy("fecha", "desc")
 );
 
+const galeria =
+document.getElementById("galeria");
+
 onSnapshot(q, (snapshot) => {
     galeria.innerHTML = "";
 
@@ -372,70 +799,156 @@ onSnapshot(q, (snapshot) => {
     });
 });
 
+
+
 /* IMAGEN INTERACTIVA */
-
-const imagenMovil = document.getElementById("imagen-movil");
-
-let moviendo = false;
-let offsetX = 0;
-let offsetY = 0;
-
-imagenMovil.addEventListener("mousedown", (e) => {
-
-    moviendo = true;
-
-    offsetX = e.clientX - imagenMovil.offsetLeft;
-    offsetY = e.clientY - imagenMovil.offsetTop;
-
-    imagenMovil.style.transform = "none";
-});
+/* NEW - mover cualquier imagen */
 
 
-document.addEventListener("mousemove", (e) => {
+function moverImagen(img){
 
-    if (!moviendo) return;
+    let moviendo = false;
+    let offsetX = 0;
+    let offsetY = 0;
 
-    imagenMovil.style.left = (e.clientX - offsetX) + "px";
-    imagenMovil.style.top = (e.clientY - offsetY) + "px";
+    img.addEventListener("mousedown", (e) => {
 
-});
+        moviendo = true;
 
+        offsetX = e.clientX - img.offsetLeft;
+        offsetY = (e.clientY + window.scrollY) - img.offsetTop;
 
-document.addEventListener("mouseup", () => {
+    });
+
+    document.addEventListener("mousemove", (e) => {
+
+        if(!moviendo) return;
+
+        const x = e.clientX - offsetX;
+        const y = (e.clientY + window.scrollY) - offsetY;
+
+        img.style.left = x + "px";
+        img.style.top = y + "px";
+
+        const id = parseInt(img.dataset.id);
+
+        elementos[id].x = x;
+        elementos[id].y = y;
+
+    });
+
+    document.addEventListener("mouseup", () => {
+        moviendo = false;
+    });
+
+    document.addEventListener("touchend", () => {
     moviendo = false;
+    });
+
+}
+
+function detectarTexto(x, y) {
+
+    return textos.find(t => {
+
+        ctx.font = t.size + "px Arial";
+
+        const width = ctx.measureText(t.text).width;
+
+        return (
+            x >= t.x &&
+            x <= t.x + width &&
+            y >= t.y - 30 &&
+            y <= t.y + 10
+        );
+    });
+}
+
+/* TOOLS MENU */
+
+const crayonBtn = document.getElementById("crayon-btn");
+const toolsMenu = document.getElementById("tools-menu");
+
+const colorTool = document.getElementById("color-tool");
+const colorPicker = document.getElementById("color-picker");
+
+const eraserTool = document.getElementById("eraser-tool");
+const textTool = document.getElementById("text-tool");
+
+crayonBtn.addEventListener("click", () => {
+
+    toolsMenu.style.display =
+        toolsMenu.style.display === "flex"
+        ? "none"
+        : "flex";
+
 });
 
 
-// soporte móvil / táctil
-imagenMovil.addEventListener("touchstart", (e) => {
 
-    moviendo = true;
+/* COLOR */
 
-    const touch = e.touches[0];
+colorTool.addEventListener("click", () => {
 
-    offsetX = touch.clientX - imagenMovil.offsetLeft;
-    offsetY = touch.clientY - imagenMovil.offsetTop;
-
-    imagenMovil.style.transform = "none";
+    colorPicker.click();
 
 });
 
 
-document.addEventListener("touchmove", (e) => {
+colorPicker.addEventListener("input", (e) => {
 
-    if (!moviendo) return;
+    currentColor = e.target.value;
 
-    const touch = e.touches[0];
+    colorTool.style.background = currentColor;
 
-    imagenMovil.style.left = (touch.clientX - offsetX) + "px";
-    imagenMovil.style.top = (touch.clientY - offsetY) + "px";
+    erasing = false;
 
 });
 
 
-document.addEventListener("touchend", () => {
-    moviendo = false;
+/* TEXT TOOL */
+
+textTool.addEventListener("click", () => {
+
+    textMode = true;
+    erasing = false;
+
 });
+
+document.addEventListener("click", (e) => {
+
+    if (!textTool.contains(e.target)) {
+        textMode = false;
+    }
+
+});
+
+/* ERASER */
+
+eraserTool.addEventListener("click", () => {
+
+    erasing = true;
+
+});
+
+crayonBtn.addEventListener("click", () => {
+
+    erasing = false;
+
+});
+
+function renderTextos() {
+    ctxText.clearRect(0, 0, textCanvas.width, textCanvas.height);
+    textos.forEach(t => {
+        ctxText.fillStyle = t.color;
+        ctxText.font = t.size + "px Arial";
+        ctxText.fillText(t.text, t.x, t.y);
+    });
+}
+
+function redraw() {
+    renderTextos(); 
+}
 
 </script>
 
