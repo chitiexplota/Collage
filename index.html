@@ -323,7 +323,7 @@ canvas {
 </head>
 
 <body>
-<img src="./logo.png" class="logo" alt="Logo">
+<img src="logo.png" class="logo" alt="Logo">
 
 <div id="fondos-fijos"></div> 
 <div id="elementos-canvas"></div>
@@ -331,7 +331,7 @@ canvas {
 <button id="enviar">Enviar Collage</button>
 
 <button id="crayon-btn">
-    <img src="./images/crayon.png" alt="Crayon">
+    <img src="images/crayon.png" alt="Crayon">
 </button>
 
 <div id="tools-menu">
@@ -358,7 +358,7 @@ canvas {
       id="eraser-tool"
       class="tool-circle">
 
-        <img src="./images/eraser.png">
+        <img src="images/eraser.png">
 
 </button>
 
@@ -415,38 +415,38 @@ const db = getFirestore(app);
 
 const imagenesDisponibles = [
 
-"./images/tmob.png",
-"./images/laus.jpeg",
-"./images/chair.png",
-"./images/bigb.png", 
+"images/tmob.png",
+"images/laus.jpeg",
+"images/chair.png",
+"images/bigb.png", 
 
 // IMAGE ABC
-  "./images/abc/A.png",
-  "./images/abc/B.png",
-  "./images/abc/C.png",
-  "./images/abc/D.png",
-  "./images/abc/E.png",
-  "./images/abc/F.png",
-  "./images/abc/G.png",
-  "./images/abc/H.png",
-  "./images/abc/I.png",
-  "./images/abc/J.png",
-  "./images/abc/K.png",
-  "./images/abc/L.png",
-  "./images/abc/M.png",
-  "./images/abc/N.png",
-  "./images/abc/O.png",
-  "./images/abc/P.png",
-  "./images/abc/Q.png",
-  "./images/abc/R.png",
-  "./images/abc/S.png",
-  "./images/abc/T.png",
-  "./images/abc/U.png",
-  "./images/abc/V.png",
-  "./images/abc/W.png",
-  "./images/abc/X.png",
-  "./images/abc/Y.png",
-  "./images/abc/Z.png",
+  "images/abc/A.png",
+  "images/abc/B.png",
+  "images/abc/C.png",
+  "images/abc/D.png",
+  "images/abc/E.png",
+  "images/abc/F.png",
+  "images/abc/G.png",
+  "images/abc/H.png",
+  "images/abc/I.png",
+  "images/abc/J.png",
+  "images/abc/K.png",
+  "images/abc/L.png",
+  "images/abc/M.png",
+  "images/abc/N.png",
+  "images/abc/O.png",
+  "images/abc/P.png",
+  "images/abc/Q.png",
+  "images/abc/R.png",
+  "images/abc/S.png",
+  "images/abc/T.png",
+  "images/abc/U.png",
+  "images/abc/V.png",
+  "images/abc/W.png",
+  "images/abc/X.png",
+  "images/abc/Y.png",
+  "images/abc/Z.png",
 ];
 
 
@@ -538,11 +538,11 @@ resizeCanvas();
 
 // 
 
-crearFondo("./images/laus.jpeg", 100, 500);  
+crearFondo("images/laus.jpeg", 100, 500);  
 
-crearImagen("./images/tmob.png",800,300);
-crearImagen("./images/chair.png",300,400);
-crearImagen("./images/bigb.png",600,300);
+crearImagen("images/tmob.png",800,300);
+crearImagen("images/chair.png",300,400);
+crearImagen("images/bigb.png",600,300);
 
 // ABC
 const alfabeto = [
@@ -565,7 +565,7 @@ for (let c = 0; c < copias; c++) {
         const x = inicioX + columna * espacioX;
         const y = inicioY + fila * espacioY;
 
-        crearLetra(`./images/abc/${letra}.png`, x, y);
+        crearLetra(`images/abc/${letra}.png`, x, y);
     });
 }
 
